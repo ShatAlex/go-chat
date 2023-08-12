@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+</head>
+<body>
+    <form method="post" style="height: 600px;">
+        <a href="/">
+            <div class="logo"></div>
+        </a>
+    
+        <h3>Регистрация</h3>
+
+        <label for="name">Имя</label>
+        <input type="text" placeholder="Имя" id="name" name="name">
+    
+        <label for="username">Логин</label>
+        <input type="text" placeholder="Логин" id="username" name="username">
+    
+        <label for="password1">Пароль</label>
+        <input type="password" placeholder="Пароль" id="password1" name="password1">
+    
+        <label for="password2">Повторите пароль</label>
+        <input type="password" placeholder="Повторите пароль" id="password2" name="password2">
+    
+        <div class="have">
+            Уже есть аккаунт? <a href="/auth/sign-in">Войти.</a>
+        </div>
+        <button class="button-login" type="submit">Зарегистрироваться</button>
+    </form>
+</body>
+</html>
