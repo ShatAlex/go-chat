@@ -62,7 +62,7 @@ body{
     border-radius: 50%
 }
 
-.people-list .about {
+.people-list .about{
     float: left;
     padding-left: 8px
 }
@@ -333,4 +333,14 @@ img {
     overflow: clip;
     vertical-align: middle;
     border-style: none;
+}
+
+#my-div {
+    width: 200px;
+}
+a.fill-div {
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-decoration: none;
 }

@@ -29,7 +29,7 @@ func (h *Handler) signUp(c *gin.Context) {
 			Password: password1,
 		}
 
-		_, err := h.services.CreateUser(input)
+		userId, err := h.services.CreateUser(input)
 
 		if err != nil {
 			newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -42,7 +42,8 @@ func (h *Handler) signUp(c *gin.Context) {
 			return
 		}
 
-		c.SetCookie("AUTH", token, 3600, "/", "127.0.0.1", false, true)
+		c.SetCookie("AUTH", token, 3600, "/", "127.0.0.1", false, false)
+		c.Set("userId", userId)
 
 		c.Redirect(302, "/")
 	}
@@ -69,7 +70,14 @@ func (h *Handler) signIn(c *gin.Context) {
 			return
 		}
 
-		c.SetCookie("AUTH", token, 3600, "/", "127.0.0.1", false, true)
+		userId, err := h.services.ParseToken(token)
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		c.SetCookie("AUTH", token, 3600, "/", "127.0.0.1", false, false)
+		c.Set("userId", userId)
 
 		c.Redirect(302, "/")
 
@@ -79,7 +87,7 @@ func (h *Handler) signIn(c *gin.Context) {
 
 func (h *Handler) signOut(c *gin.Context) {
 
-	c.SetCookie("AUTH", "", 1, "/", "127.0.0.1", false, true)
+	c.SetCookie("AUTH", "", 1, "/", "127.0.0.1", false, false)
 
 	c.Redirect(302, "/")
 

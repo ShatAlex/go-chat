@@ -25,8 +25,6 @@ func (h *Handler) InitRouters() *gin.Engine {
 	store.Options(sessions.Options{MaxAge: 60 * 60 * 24}) // expire in a day
 	router.Use(sessions.Sessions("auth", store))
 
-	router.GET("/", h.homePage)
-
 	auth := router.Group("/auth")
 	{
 		auth.GET("/sign-up", h.signUp)
@@ -37,6 +35,12 @@ func (h *Handler) InitRouters() *gin.Engine {
 
 		auth.GET("/sign-out", h.signOut)
 	}
+
+	router.GET("/", h.homePage)
+	router.GET("/create-chat", h.createChat)
+	router.POST("/create-chat", h.createChat)
+
+	router.GET("chat/:id", h.chatPage)
 
 	return router
 }
