@@ -42,5 +42,8 @@ func (h *Handler) InitRouters() *gin.Engine {
 
 	router.GET("chat/:id", h.chatPage)
 
+	router.GET("chat/:id/add-user", h.addUser)
+	router.POST("chat/:id/add-user", h.addUser)
+
 	return router
 }

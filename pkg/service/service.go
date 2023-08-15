@@ -15,6 +15,8 @@ type Chat interface {
 	Create(name string, userId int) error
 	GetUserChats(userId int) ([]chat.Chat, error)
 	GetMessages(chatId, userId int) ([]chat.Message, error)
+	AddUser(chatId int, username string) error
+	CreateMessage(userId, chatId int, content string) error
 }
 
 type Service struct {

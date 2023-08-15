@@ -23,3 +23,17 @@ func (s *ChatService) GetUserChats(userId int) ([]chat.Chat, error) {
 func (s *ChatService) GetMessages(chatId, userId int) ([]chat.Message, error) {
 	return s.repChat.GetMessages(chatId, userId)
 }
+
+func (s *ChatService) AddUser(chatId int, username string) error {
+
+	userId, err := s.repChat.GetUserIdByUsername(username)
+	if err != nil {
+		return err
+	}
+
+	return s.repChat.AddUser(chatId, userId)
+}
+
+func (s *ChatService) CreateMessage(userId, chatId int, content string) error {
+	return s.repChat.CreateMessage(userId, chatId, content)
+}

@@ -105,10 +105,45 @@ func (h *Handler) chatPage(c *gin.Context) {
 		return
 	}
 
+	var adminId int
+	for _, v := range chats {
+		if v.Id == chatId {
+			adminId = v.Admin_id
+		}
+	}
+
 	c.HTML(http.StatusOK, "chat.html", gin.H{
 		"chats":    chats,
 		"messages": messages,
 		"chatId":   chatId,
+		"adminId":  adminId,
 		"userId":   userId,
 	})
+}
+
+func (h *Handler) addUser(c *gin.Context) {
+
+	chatId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid chatId")
+		return
+	}
+
+	if c.Request.Method == "GET" {
+		c.HTML(http.StatusOK, "addUser.html", gin.H{})
+	}
+
+	if c.Request.Method == "POST" {
+
+		username := c.Request.FormValue("username")
+
+		err = h.services.Chat.AddUser(chatId, username)
+
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		c.Redirect(302, "/chat/"+strconv.Itoa(chatId))
+	}
 }

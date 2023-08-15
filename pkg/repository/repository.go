@@ -14,6 +14,9 @@ type Chat interface {
 	Create(name string, userId int) error
 	GetUserChats(userId int) ([]chat.Chat, error)
 	GetMessages(chatId, userId int) ([]chat.Message, error)
+	GetUserIdByUsername(username string) (int, error)
+	AddUser(chatId, userId int) error
+	CreateMessage(userId, chatId int, content string) error
 }
 
 type Repository struct {

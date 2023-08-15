@@ -1,8 +1,9 @@
 package chat
 
 type Chat struct {
-	Id   int    `json:"_"`
-	Name string `json:"name" binding:"required"`
+	Id       int    `json:"_"`
+	Name     string `json:"name" binding:"required"`
+	Admin_id int    `json:"admin_id" binding:"required"`
 }
 
 type Message struct {

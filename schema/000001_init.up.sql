@@ -9,6 +9,7 @@ CREATE TABLE users
 CREATE TABLE chats
 (
     id serial not null unique,
+    admin_id int references users(id) on delete restrict not null,
     name varchar(255) not null unique
 );
 
@@ -24,5 +25,6 @@ CREATE TABLE messages
     id serial not null unique,
     user_id int references users(id) on delete cascade not null,
     chat_id int references chats(id) on delete cascade not null,
+    datetime timestamp not null,
     content varchar(255)
 );
