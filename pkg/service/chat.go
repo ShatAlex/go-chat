@@ -13,7 +13,7 @@ func NewChatService(repChat repository.Chat) *ChatService {
 	return &ChatService{repChat: repChat}
 }
 
-func (s *ChatService) Create(name string, userId int) error {
+func (s *ChatService) Create(name string, userId int) (int, error) {
 	return s.repChat.Create(name, userId)
 }
 func (s *ChatService) GetUserChats(userId int) ([]chat.Chat, error) {

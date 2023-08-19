@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/ShatAlex/chat"
@@ -41,14 +40,13 @@ func main() {
 	service := service.NewService(rep)
 	handlers := handler.NewHandler(service)
 
+	wsHandler := handler.NewWsHandler(service)
+
 	server := new(chat.Server)
 
-	if err := server.Run(viper.GetString("port"), handlers.InitRouters()); err != nil {
+	if err := server.Run(viper.GetString("port"), handlers.InitRouters(wsHandler)); err != nil {
 		log.Fatalf("error occured while running server: %s", err.Error())
 	}
-
-	http.HandleFunc("/ws", handlers.WsEndpoint)
-
 }
 
 func initConfig() error {

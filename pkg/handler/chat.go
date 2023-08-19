@@ -61,10 +61,17 @@ func (h *Handler) createChat(c *gin.Context) {
 			return
 		}
 
-		err = h.services.Chat.Create(name, userId)
+		chatId, err := h.services.Chat.Create(name, userId)
 
 		if err != nil {
 			newErrorResponse(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		//Creating new Online Room for websocket connection
+		err = h.services.Websocket.CreateRoom(chatId, name)
+		if err != nil {
+			newErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -74,51 +81,6 @@ func (h *Handler) createChat(c *gin.Context) {
 
 func (h *Handler) chatPage(c *gin.Context) {
 
-	token := ""
-	if cookie, err := c.Request.Cookie("AUTH"); err == nil {
-		token = cookie.Value
-	}
-
-	var chats []chat.Chat
-
-	userId, err := h.services.ParseToken(token)
-	if err != nil {
-		log.Print(err.Error())
-		return
-	}
-
-	chats, err = h.services.GetUserChats(userId)
-	if err != nil {
-		log.Print(err.Error())
-		return
-	}
-
-	chatId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid chatId")
-		return
-	}
-
-	messages, err := h.services.GetMessages(chatId, userId)
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	var adminId int
-	for _, v := range chats {
-		if v.Id == chatId {
-			adminId = v.Admin_id
-		}
-	}
-
-	c.HTML(http.StatusOK, "chat.html", gin.H{
-		"chats":    chats,
-		"messages": messages,
-		"chatId":   chatId,
-		"adminId":  adminId,
-		"userId":   userId,
-	})
 }
 
 func (h *Handler) addUser(c *gin.Context) {

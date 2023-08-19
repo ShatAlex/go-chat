@@ -11,7 +11,7 @@ type Authorization interface {
 }
 
 type Chat interface {
-	Create(name string, userId int) error
+	Create(name string, userId int) (int, error)
 	GetUserChats(userId int) ([]chat.Chat, error)
 	GetMessages(chatId, userId int) ([]chat.Message, error)
 	GetUserIdByUsername(username string) (int, error)
