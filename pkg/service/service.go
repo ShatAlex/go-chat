@@ -21,6 +21,7 @@ type Chat interface {
 
 type Websocket interface {
 	CreateRoom(int, string) error
+	RunRoomsMethods(*chat.Client, *chat.Message)
 }
 
 type Service struct {
@@ -30,9 +31,13 @@ type Service struct {
 }
 
 func NewService(rep *repository.Repository) *Service {
+
+	hub := chat.NewHub()
+	go hub.Run()
+
 	return &Service{
 		Authorization: NewAuthService(rep.Authorization),
 		Chat:          NewChatService(rep.Chat),
-		Websocket:     NewWebSocketService(chat.NewHub()),
+		Websocket:     NewWebSocketService(hub),
 	}
 }

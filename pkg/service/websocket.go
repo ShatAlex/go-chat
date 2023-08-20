@@ -1,29 +1,34 @@
 package service
 
 import (
-	"log"
-
 	"github.com/ShatAlex/chat"
 )
 
-type WebsocketService struct {
-	Hub *chat.Hub
+type WebSocketService struct {
+	hub *chat.Hub
 }
 
-func NewWebSocketService(hub *chat.Hub) *WebsocketService {
+func NewWebSocketService(hub *chat.Hub) *WebSocketService {
 	return &WebSocketService{
-		Hub: hub,
+		hub: hub,
 	}
 }
 
-func (s *WebsocketService) CreateRoom(chatId int, name string) error {
-	s.Hub.Rooms[chatId] = &chat.Room{
+func (s *WebSocketService) CreateRoom(chatId int, name string) error {
+	s.hub.Rooms[chatId] = &chat.Room{
 		Id:     chatId,
 		Name:   name,
 		Clints: make(map[int]*chat.Client),
 	}
 
-	log.Print(s.Hub.Rooms[chatId])
-
 	return nil
+}
+
+func (s *WebSocketService) RunRoomsMethods(cl *chat.Client, m *chat.Message) {
+	s.hub.Register <- cl
+	s.hub.Broadcast <- m
+
+	go cl.WriteMessage()
+	cl.ReadMessage(s.hub)
+
 }

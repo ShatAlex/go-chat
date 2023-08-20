@@ -75,10 +75,10 @@ func (h *WsHandler) joinRoom(c *gin.Context) {
 	}
 
 	cl := &chat.Client{
-		Conn:     conn,
-		Messagee: make(chan *chat.Message, 10),
-		Id:       userId,
-		ChatId:   chatId,
+		Conn:    conn,
+		Message: make(chan *chat.Message, 10),
+		Id:      userId,
+		ChatId:  chatId,
 	}
 
 	m := &chat.Message{
@@ -94,6 +94,8 @@ func (h *WsHandler) joinRoom(c *gin.Context) {
 		"adminId":  adminId,
 		"userId":   userId,
 	})
+
+	h.services.Websocket.RunRoomsMethods(cl, m)
 
 }
 
