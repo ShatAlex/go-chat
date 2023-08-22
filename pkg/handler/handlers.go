@@ -40,10 +40,10 @@ func (h *Handler) InitRouters(wsh *WsHandler) *gin.Engine {
 	router.GET("/create-chat", h.createChat)
 	router.POST("/create-chat", h.createChat)
 
-	router.GET("chat/:id", wsh.joinRoom)
+	router.GET("/chat/:id", wsh.joinRoom)
 
-	router.GET("chat/:id/add-user", h.addUser)
-	router.POST("chat/:id/add-user", h.addUser)
+	router.GET("/chat/:id/add-user", h.addUser)
+	router.POST("/chat/:id/add-user", h.addUser)
 
 	return router
 }

@@ -79,10 +79,6 @@ func (h *Handler) createChat(c *gin.Context) {
 	}
 }
 
-func (h *Handler) chatPage(c *gin.Context) {
-
-}
-
 func (h *Handler) addUser(c *gin.Context) {
 
 	chatId, err := strconv.Atoi(c.Param("id"))

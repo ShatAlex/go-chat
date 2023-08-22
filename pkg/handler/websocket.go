@@ -14,9 +14,7 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
 type WsHandler struct {
@@ -30,6 +28,11 @@ func NewWsHandler(ser *service.Service) *WsHandler {
 }
 
 func (h *WsHandler) joinRoom(c *gin.Context) {
+
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+	}
 
 	token := ""
 	if cookie, err := c.Request.Cookie("AUTH"); err == nil {
@@ -67,11 +70,6 @@ func (h *WsHandler) joinRoom(c *gin.Context) {
 		if v.Id == chatId {
 			adminId = v.Admin_id
 		}
-	}
-
-	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	cl := &chat.Client{
