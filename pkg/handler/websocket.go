@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/ShatAlex/chat"
-	"github.com/ShatAlex/chat/pkg/service"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -17,22 +16,23 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
-type WsHandler struct {
-	services *service.Service
-}
+func wshandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Printf("Failed to set websocket upgrade: %+v", err)
+		return
+	}
 
-func NewWsHandler(ser *service.Service) *WsHandler {
-	return &WsHandler{
-		services: ser,
+	for {
+		t, msg, err := conn.ReadMessage()
+		if err != nil {
+			break
+		}
+		conn.WriteMessage(t, msg)
 	}
 }
 
 func (h *WsHandler) joinRoom(c *gin.Context) {
-
-	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
-	}
 
 	token := ""
 	if cookie, err := c.Request.Cookie("AUTH"); err == nil {
@@ -73,7 +73,7 @@ func (h *WsHandler) joinRoom(c *gin.Context) {
 	}
 
 	cl := &chat.Client{
-		Conn:    conn,
+		Conn:    nil,
 		Message: make(chan *chat.Message, 10),
 		Id:      userId,
 		ChatId:  chatId,
@@ -96,28 +96,3 @@ func (h *WsHandler) joinRoom(c *gin.Context) {
 	h.services.Websocket.RunRoomsMethods(cl, m)
 
 }
-
-// var clients []websocket.Conn
-
-// func (h *Handler) WsEndpoint(w http.ResponseWriter, r *http.Request) {
-
-// 	conn, _ := upgrader.Upgrade(w, r, nil)
-// 	defer conn.Close()
-
-// 	clients = append(clients, *conn)
-
-// 	for {
-// 		messageType, message, err := conn.ReadMessage()
-// 		if err != nil || messageType == websocket.CloseMessage {
-// 			return
-// 		}
-
-// 		for _, client := range clients {
-// 			if err = client.WriteMessage(messageType, message); err != nil {
-// 				log.Println(err)
-// 				return
-// 			}
-// 		}
-// 	}
-
-// }

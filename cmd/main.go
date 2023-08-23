@@ -44,7 +44,7 @@ func main() {
 
 	server := new(chat.Server)
 
-	if err := server.Run(viper.GetString("port"), handlers.InitRouters(wsHandler)); err != nil {
+	if err := server.Run(viper.GetString("port"), handler.InitRouters(handlers, wsHandler)); err != nil {
 		log.Fatalf("error occured while running server: %s", err.Error())
 	}
 }

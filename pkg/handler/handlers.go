@@ -15,7 +15,15 @@ func NewHandler(ser *service.Service) *Handler {
 	return &Handler{services: ser}
 }
 
-func (h *Handler) InitRouters(wsh *WsHandler) *gin.Engine {
+type WsHandler struct {
+	services *service.Service
+}
+
+func NewWsHandler(ser *service.Service) *WsHandler {
+	return &WsHandler{services: ser}
+}
+
+func InitRouters(h *Handler, wsh *WsHandler) *gin.Engine {
 	router := gin.Default()
 
 	router.LoadHTMLGlob("./pkg/templates/*")
@@ -44,6 +52,10 @@ func (h *Handler) InitRouters(wsh *WsHandler) *gin.Engine {
 
 	router.GET("/chat/:id/add-user", h.addUser)
 	router.POST("/chat/:id/add-user", h.addUser)
+
+	router.GET("/ws", func(c *gin.Context) {
+		wshandler(c.Writer, c.Request)
+	})
 
 	return router
 }
