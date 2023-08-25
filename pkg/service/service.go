@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/ShatAlex/chat"
 	"github.com/ShatAlex/chat/pkg/repository"
+	"github.com/gorilla/websocket"
 )
 
 type Authorization interface {
@@ -21,7 +22,7 @@ type Chat interface {
 
 type Websocket interface {
 	CreateRoom(int, string) error
-	RunRoomsMethods(*chat.Client, *chat.Message)
+	PushNewUser(*websocket.Conn, int) []*websocket.Conn
 }
 
 type Service struct {
@@ -33,7 +34,6 @@ type Service struct {
 func NewService(rep *repository.Repository) *Service {
 
 	hub := chat.NewHub()
-	go hub.Run()
 
 	return &Service{
 		Authorization: NewAuthService(rep.Authorization),

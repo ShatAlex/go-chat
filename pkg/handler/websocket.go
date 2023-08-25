@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
-	"github.com/ShatAlex/chat"
-	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
@@ -16,83 +16,40 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
-func wshandler(w http.ResponseWriter, r *http.Request) {
+func (h *WsHandler) wshandler(w http.ResponseWriter, r *http.Request) {
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("Failed to set websocket upgrade: %+v", err)
 		return
 	}
 
+	chatId, err := strconv.Atoi(strings.Split(r.URL.RawQuery, "=")[1])
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	userId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[2])
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	clients := h.services.Websocket.PushNewUser(conn, chatId)
+
 	for {
-		t, msg, err := conn.ReadMessage()
+		msgType, msg, err := conn.ReadMessage()
 		if err != nil {
-			break
+			return
 		}
-		conn.WriteMessage(t, msg)
-	}
-}
+		fmt.Printf("%s - user_id: %d on chat_id: %d send: %s\n", conn.RemoteAddr(), userId, chatId, string(msg))
 
-func (h *WsHandler) joinRoom(c *gin.Context) {
-
-	token := ""
-	if cookie, err := c.Request.Cookie("AUTH"); err == nil {
-		token = cookie.Value
-	}
-
-	var chats []chat.Chat
-
-	userId, err := h.services.ParseToken(token)
-	if err != nil {
-		log.Print(err.Error())
-		return
-	}
-
-	chats, err = h.services.GetUserChats(userId)
-	if err != nil {
-		log.Print(err.Error())
-		return
-	}
-
-	chatId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid chatId")
-		return
-	}
-
-	messages, err := h.services.GetMessages(chatId, userId)
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	var adminId int
-	for _, v := range chats {
-		if v.Id == chatId {
-			adminId = v.Admin_id
+		for _, client := range clients {
+			if err = client.WriteMessage(msgType, msg); err != nil {
+				return
+			}
 		}
+
 	}
-
-	cl := &chat.Client{
-		Conn:    nil,
-		Message: make(chan *chat.Message, 10),
-		Id:      userId,
-		ChatId:  chatId,
-	}
-
-	m := &chat.Message{
-		Chat_id: chatId,
-		User_id: userId,
-		Content: "User has joined the room",
-	}
-
-	c.HTML(http.StatusOK, "chat.html", gin.H{
-		"chats":    chats,
-		"messages": messages,
-		"chatId":   chatId,
-		"adminId":  adminId,
-		"userId":   userId,
-	})
-
-	h.services.Websocket.RunRoomsMethods(cl, m)
-
 }

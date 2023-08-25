@@ -105,3 +105,52 @@ func (h *Handler) addUser(c *gin.Context) {
 		c.Redirect(302, "/chat/"+strconv.Itoa(chatId))
 	}
 }
+
+func (h *Handler) joinRoom(c *gin.Context) {
+
+	token := ""
+	if cookie, err := c.Request.Cookie("AUTH"); err == nil {
+		token = cookie.Value
+	}
+
+	var chats []chat.Chat
+
+	userId, err := h.services.ParseToken(token)
+	if err != nil {
+		log.Print(err.Error())
+		return
+	}
+
+	chats, err = h.services.GetUserChats(userId)
+	if err != nil {
+		log.Print(err.Error())
+		return
+	}
+
+	chatId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid chatId")
+		return
+	}
+
+	messages, err := h.services.GetMessages(chatId, userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var adminId int
+	for _, v := range chats {
+		if v.Id == chatId {
+			adminId = v.Admin_id
+		}
+	}
+
+	c.HTML(http.StatusOK, "chat.html", gin.H{
+		"chats":    chats,
+		"messages": messages,
+		"chatId":   chatId,
+		"adminId":  adminId,
+		"userId":   userId,
+	})
+}

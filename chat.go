@@ -1,6 +1,10 @@
 package chat
 
-import "time"
+import (
+	"time"
+
+	"github.com/gorilla/websocket"
+)
 
 type Chat struct {
 	Id       int    `json:"_"`
@@ -9,9 +13,9 @@ type Chat struct {
 }
 
 type Room struct {
-	Id     int             `json:"_"`
-	Name   string          `json:"name"`
-	Clints map[int]*Client `json:"clients"`
+	Id      int               `json:"_"`
+	Name    string            `json:"name"`
+	Clients []*websocket.Conn `json:"clients"`
 }
 
 type Message struct {
