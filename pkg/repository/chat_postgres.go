@@ -83,7 +83,7 @@ func (r *ChatPostgres) CreateMessage(userId, chatId int, content string) error {
 
 	query := fmt.Sprintf("INSERT INTO %s (user_id, chat_id, datetime, content) VALUES ($1, $2, $3, $4)", messagesTable)
 
-	_, err := r.db.Exec(query, userId, chatId, time.Now())
+	_, err := r.db.Exec(query, userId, chatId, time.Now(), content)
 
 	return err
 }

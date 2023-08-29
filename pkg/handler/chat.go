@@ -154,3 +154,31 @@ func (h *Handler) joinRoom(c *gin.Context) {
 		"userId":   userId,
 	})
 }
+
+func (h *Handler) createMessage(c *gin.Context) {
+
+	chatId, err := strconv.Atoi(c.Query("chatId"))
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	// userId, err := strconv.Atoi(c.Query("userId"))
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// 	return
+	// }
+
+	// content := c.Query("content")
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// 	return
+	// }
+
+	if err = h.services.Chat.CreateMessage(1, chatId, "asdsad"); err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	c.Redirect(302, "/chat/"+strconv.Itoa(chatId))
+}

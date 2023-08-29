@@ -114,7 +114,12 @@
                     }
             
                     function send(){
-                        socket.send(input.value)
+                        const req = new XMLHttpRequest();
+                        const data = input.value
+                        const url='http://127.0.0.1:8080/create-message?userId={{.userId}}&chatId={{.chatId}}&content=' + data
+                        req.open("GET", url);
+                        req.send()
+                        socket.send(data)
                         input.value = ""
                     }
                 </script>

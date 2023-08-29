@@ -53,6 +53,8 @@ func InitRouters(h *Handler, wsh *WsHandler) *gin.Engine {
 	router.GET("/chat/:id/add-user", h.addUser)
 	router.POST("/chat/:id/add-user", h.addUser)
 
+	router.POST("/create-message", h.createMessage)
+
 	router.GET("/ws/:id", func(c *gin.Context) {
 		wsh.wshandler(c.Writer, c.Request)
 	})
